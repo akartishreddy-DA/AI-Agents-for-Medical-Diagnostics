@@ -1,6 +1,6 @@
 # AI-Agents-for-Medical-Diagnostics
 
-<img width="900" alt="image" src="https://github.com/user-attachments/assets/b7c87bf6-dfff-42fe-b8d1-9be9e6c7ce86">
+<img width="900" alt="image" src="git clone https://github.com/akartishreddy-DA/AI-Agents-for-Medical-Diagnostics.git">
 
 A Python project that creates specialized **LLM-based AI agents** to analyze complex medical cases.  
 The system integrates insights from different medical specialists to provide comprehensive assessments  
@@ -90,3 +90,58 @@ This repository is licensed under the **MIT License**.
 You are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to the conditions described in the [LICENSE](LICENSE) file.  
 
 The software is provided **“as is”**, without warranty of any kind.
+
+---
+
+## 🛠 Tech Stack
+
+- Python 3.x
+- OpenAI GPT-5
+- Threading (parallel agent execution)
+- Streamlit (Web UI)
+- Environment variable configuration
+- Modular agent-based architecture
+- Git & GitHub workflow
+
+---
+
+## 🧠 System Architecture
+
+1. Medical report input  
+2. Parallel processing via specialist AI agents  
+3. Agent-level reasoning and structured outputs  
+4. Aggregation layer combines insights  
+5. Final summarized diagnostic suggestions  
+
+This architecture demonstrates multi-agent orchestration and concurrent execution design patterns in Python.
+
+---
+
+## 📊 Key Technical Concepts Demonstrated
+
+- Multi-agent LLM orchestration  
+- Parallel execution using threading  
+- Prompt engineering for domain specialization  
+- Modular system design  
+- Environment-based configuration management  
+- Clean Git branching & PR workflow  
+
+---
+
+## 🎯 Project Highlights for Recruiters
+
+- Designed scalable multi-agent AI architecture  
+- Implemented concurrent execution pipeline  
+- Structured reasoning aggregation from multiple LLM agents  
+- Built interactive medical case simulation system  
+- Maintained production-style repository structure  
+
+---
+
+## 🚀 Potential Enterprise Use Cases
+
+- Clinical decision-support systems  
+- AI-assisted triage platforms  
+- Specialist consultation simulation tools  
+- Healthcare AI research prototypes  
+- Medical education support systems  
