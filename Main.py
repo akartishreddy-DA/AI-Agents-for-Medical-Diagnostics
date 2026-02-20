@@ -1,58 +1,116 @@
-# Importing the needed modules 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from Utils.Agents import Cardiologist, Psychologist, Pulmonologist, MultidisciplinaryTeam
-from dotenv import load_dotenv
-import json, os
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# Loading API key from a dotenv file.
-load_dotenv(dotenv_path='apikey.env')
-
-# read the medical report
-with open("Medical Reports\Medical Rerort - Michael Johnson - Panic Attack Disorder.txt", "r") as file:
-    medical_report = file.read()
+from datetime import datetime
+import sqlite3
+import os
 
 
-agents = {
-    "Cardiologist": Cardiologist(medical_report),
-    "Psychologist": Psychologist(medical_report),
-    "Pulmonologist": Pulmonologist(medical_report)
-}
-
-# Function to run each agent and get their response
-def get_response(agent_name, agent):
-    response = agent.run()
-    return agent_name, response
-
-# Run the agents concurrently and collect responses
-responses = {}
-with ThreadPoolExecutor() as executor:
-    futures = {executor.submit(get_response, name, agent): name for name, agent in agents.items()}
-    
-    for future in as_completed(futures):
-        agent_name, response = future.result()
-        responses[agent_name] = response
-
-team_agent = MultidisciplinaryTeam(
-    cardiologist_report=responses["Cardiologist"],
-    psychologist_report=responses["Psychologist"],
-    pulmonologist_report=responses["Pulmonologist"]
-)
-
-# Run the MultidisciplinaryTeam agent to generate the final diagnosis
-final_diagnosis = team_agent.run()
-final_diagnosis_text = "### Final Diagnosis:\n\n" + final_diagnosis
-txt_output_path = "results/final_diagnosis.txt"
-
-# Ensure the directory exists
-os.makedirs(os.path.dirname(txt_output_path), exist_ok=True)
-
-# Write the final diagnosis to the text file
-with open(txt_output_path, "w") as txt_file:
-    txt_file.write(final_diagnosis_text)
-
-print(f"Final diagnosis has been saved to {txt_output_path}")
+# ---------------------------
+# DATABASE SETUP
+# ---------------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "diagnosis.db")
 
 
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS diagnoses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TEXT,
+            input_text TEXT,
+            cardiologist TEXT,
+            psychologist TEXT,
+            pulmonologist TEXT,
+            final_assessment TEXT
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+
+# Initialize DB when module loads
+init_db()
+
+
+# ---------------------------
+# MAIN FUNCTION
+# ---------------------------
+def run_diagnosis(medical_text: str) -> dict:
+
+    medical_report = medical_text.strip()
+
+    if not medical_report:
+        return {
+            "Cardiologist": "No input provided.",
+            "Psychologist": "No input provided.",
+            "Pulmonologist": "No input provided.",
+            "Final Assessment": "No input provided."
+        }
+
+    agents = {
+        "Cardiologist": Cardiologist(None, medical_report),
+        "Psychologist": Psychologist(None, medical_report),
+        "Pulmonologist": Pulmonologist(None, medical_report)
+    }
+
+    results = {}
+
+    # Run in parallel
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = {
+            executor.submit(agent.run): name
+            for name, agent in agents.items()
+        }
+
+        for future in as_completed(futures):
+            agent_name = futures[future]
+            try:
+                results[agent_name] = future.result()
+            except Exception as e:
+                results[agent_name] = f"Error: {str(e)}"
+
+    team = MultidisciplinaryTeam(
+        None,
+        results.get("Cardiologist"),
+        results.get("Psychologist"),
+        results.get("Pulmonologist")
+    )
+
+    results["Final Assessment"] = team.run()
+
+    # ---------------------------
+    # SAVE TO DATABASE
+    # ---------------------------
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO diagnoses (
+                timestamp,
+                input_text,
+                cardiologist,
+                psychologist,
+                pulmonologist,
+                final_assessment
+            ) VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            datetime.now().isoformat(),
+            medical_report,
+            results.get("Cardiologist"),
+            results.get("Psychologist"),
+            results.get("Pulmonologist"),
+            results.get("Final Assessment")
+        ))
+
+        conn.commit()
+        conn.close()
+
+    except Exception as e:
+        print("Database insert failed:", str(e))
+
+    return results

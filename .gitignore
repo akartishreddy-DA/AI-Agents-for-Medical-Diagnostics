@@ -115,3 +115,9 @@ datasets/
 results/
 outputs/
 logs/
+# SQLite database
+diagnosis.db
+*.db
+
+# Streamlit cache
+.streamlit/
