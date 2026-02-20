@@ -1,6 +1,6 @@
 # AI-Agents-for-Medical-Diagnostics
 
-<img width="900" alt="image" src="git clone https://github.com/akartishreddy-DA/AI-Agents-for-Medical-Diagnostics.git">
+<img width="900" alt="image" src="https://github.com/user-attachments/assets/b7c87bf6-dfff-42fe-b8d1-9be9e6c7ce86">
 
 A Python project that creates specialized **LLM-based AI agents** to analyze complex medical cases.  
 The system integrates insights from different medical specialists to provide comprehensive assessments  
@@ -53,7 +53,7 @@ The outputs are then combined and summarized into **three possible health issues
 
 1. **Clone the repo:**
    ```bash
-   git clone https://github.com/ahmadvh/AI-Agents-for-Medical-Diagnostics.git
+   git clone https://github.com/akartishreddy-DA/AI-Agents-for-Medical-Diagnostics.git
    cd AI-Agents-for-Medical-Diagnostics
    ```
 2. **Create a virtual environment and install dependencies:**
@@ -68,7 +68,7 @@ The outputs are then combined and summarized into **three possible health issues
     ```bash
     OPENAI_API_KEY=your_api_key_here
     ```
-4. **Run the system:** `python main.py`
+4. **Run the system:** `python -m streamlit run web_app/app.py`
 ---
 
 ## 🔮 Future Enhancements
